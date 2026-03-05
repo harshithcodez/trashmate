@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrashMate</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Immersive Background Objects -->
+    <div class="ambient-layer">
+        <div class="orb orb-core" id="dynamic-orb"></div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="ri-recycle-fill logo-icon"></i>
+            <span>TrashMate</span>
+        </div>
+        <div class="nav-actions">
+            <button id="stats-trigger" class="glass-btn">
+                <i class="ri-bar-chart-box-line"></i>
+                <span id="stats-badge" class="badge">0</span>
+            </button>
+            <button id="guide-trigger" class="glass-btn">
+                <i class="ri-booklet-line"></i>
+                <span>Guidelines</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+
+        <!-- Search Area -->
+        <div class="search-section" id="search-section">
+            <h1 class="question-text">What are you throwing away?</h1>
+
+            <div class="search-bar-wrapper">
+                <i class="ri-search-line search-icon"></i>
+                <input type="text" id="waste-input" placeholder="Type an item (e.g., wrapper, apple, battery...)"
+                    autocomplete="off" spellcheck="false">
+
+                <!-- Hidden file input for image upload -->
+                <input type="file" id="image-upload" accept="image/*" class="hidden">
+                <button id="camera-btn" class="action-icon" title="Scan Image">
+                    <i class="ri-camera-lens-line"></i>
+                </button>
+
+                <button id="clear-btn" class="action-icon hidden">
+                    <i class="ri-close-fill"></i>
+                </button>
+                <button id="classify-btn" class="search-submit">
+                    <i class="ri-arrow-right-line"></i>
+                </button>
+            </div>
+
+            <p class="hint-text">Press <kbd>Enter</kbd> to identify</p>
+
+            <div class="help-action-wrapper">
+                <button id="help-identify-btn" class="help-pill">
+                    <i class="ri-question-line"></i> Not sure what it is?
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Area -->
+        <div class="result-section hidden" id="result-section">
+            <button id="back-btn" class="back-link">
+                <i class="ri-arrow-left-line"></i> Search again
+            </button>
+
+            <div class="premium-card">
+                <div class="card-glow" id="card-glow"></div>
+                <div class="card-content">
+
+                    <div class="result-top">
+                        <div class="icon-stage" id="icon-stage">
+                            <i id="result-icon" class="ri-delete-bin-6-line"></i>
+                        </div>
+                        <div class="result-titles">
+                            <span class="bin-label" id="result-bin">Loading...</span>
+                            <h2 class="category-title" id="result-category">Category</h2>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="result-details">
+                        <!-- 1. Confidence Score -->
+                        <div class="confidence-wrapper" id="confidence-wrapper">
+                            <div class="confidence-header">
+                                <span class="confidence-label">AI Confidence</span>
+                                <span class="confidence-value" id="confidence-value">98%</span>
+                            </div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidence-fill"></div>
+                            </div>
+                        </div>
+
+                        <p id="result-desc" class="description-text">Description goes here.</p>
+
+                        <!-- 2 & 7. Instructions and Impact -->
+                        <div id="extra-info" class="extra-info hidden">
+                            <div class="info-block instructions">
+                                <h5><i class="ri-recycle-line"></i> Disposal Steps</h5>
+                                <p id="result-instructions">Instructions...</p>
+                            </div>
+                            <div class="info-block impact">
+                                <h5><i class="ri-earth-line"></i> Environmental Impact</h5>
+                                <p id="result-impact">Impact...</p>
+                            </div>
+                        </div>
+
+                        <div id="unknown-action" class="hidden action-area">
+                            <!-- 3. Smart Suggestions -->
+                            <div id="smart-suggestions" class="smart-suggestions hidden">
+                                <p>Did you mean?</p>
+                                <div id="suggestion-chips" class="suggestion-chips"></div>
+                            </div>
+                            <button id="unknown-guide-btn" class="glass-btn primary">
+                                Read Segregation Rules
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scanning Overlay -->
+    <div id="scanning-overlay" class="scanning-overlay hidden">
+        <div class="scanner-container">
+            <div class="scan-image-wrapper">
+                <img id="scanned-image-preview" src="" alt="Scanning...">
+                <div class="scan-line"></div>
+                <div class="scan-corners"></div>
+            </div>
+            <div class="scan-text">
+                <h3>Analyzing AI Vision...</h3>
+                <p>Identifying material composition</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guidelines Modal -->
+    <div id="guide-modal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Global Segregation Rules</h3>
+                <button id="close-modal" class="close-modal-btn">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="rule-grid">
+                    <div class="rule-card wet">
+                        <div class="rule-icon"><i class="ri-leaf-fill"></i></div>
+                        <div class="rule-info">
+                            <h4>Green Bin / Wet</h4>
+                            <p>Organic, biodegradable waste like food scraps, peels, plants. Composts easily.</p>
+                        </div>
+                    </div>
+                    <div class="rule-card dry">
+                        <div class="rule-icon"><i class="ri-box-3-fill"></i></div>
+                        <div class="rule-info">
+                            <h4>Blue Bin / Dry</h4>
+                            <p>Clean recyclables & non-biodegradables: Plastic, paper, glass, chips packets.</p>
+                        </div>
+                    </div>
+                    <div class="rule-card hazard">
+                        <div class="rule-icon"><i class="ri-skull-2-fill"></i></div>
+                        <div class="rule-info">
+                            <h4>Red Bin / Hazardous</h4>
+                            <p>Toxic/Medical: Batteries, paint, medicines, syringes, chemicals.</p>
+                        </div>
+                    </div>
+                    <div class="rule-card ewaste">
+                        <div class="rule-icon"><i class="ri-macbook-fill"></i></div>
+                        <div class="rule-info">
+                            <h4>Special / E-Waste</h4>
+                            <p>Electronics: Cables, old phones, chargers, dead appliances.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal (6. Dashboard) -->
+    <div id="stats-modal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Your Impact Dashboard 📊</h3>
+                <button id="close-stats-btn" class="close-modal-btn">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-overview">
+                    <div class="stat-box default">
+                        <i class="ri-focus-3-line"></i>
+                        <h2 id="stat-total">0</h2>
+                        <p>Total Items</p>
+                    </div>
+                    <div class="stat-box wet">
+                        <i class="ri-leaf-fill"></i>
+                        <h2 id="stat-wet">0</h2>
+                        <p>Wet</p>
+                    </div>
+                    <div class="stat-box dry">
+                        <i class="ri-box-3-fill"></i>
+                        <h2 id="stat-dry">0</h2>
+                        <p>Dry</p>
+                    </div>
+                    <div class="stat-box hazard">
+                        <i class="ri-skull-2-fill"></i>
+                        <h2 id="stat-hazard">0</h2>
+                        <p>Hazard</p>
+                    </div>
+                    <div class="stat-box ewaste">
+                        <i class="ri-macbook-fill"></i>
+                        <h2 id="stat-ewaste">0</h2>
+                        <p>E-Waste</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
