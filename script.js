@@ -234,7 +234,7 @@ function saveToHistory(itemName, categoryKey) {
     const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     // Add to beginning of array
-    searchHistory.unshift({ itemName: capitalize(itemName), categoryName, date });
+    searchHistory.unshift({ itemName: capitalize(itemName), categoryName, categoryKey, date });
 
     // Keep max 50 items
     if (searchHistory.length > 50) {
@@ -248,18 +248,22 @@ function renderHistory() {
     historyList.innerHTML = '';
 
     if (searchHistory.length === 0) {
-        historyList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No items scanned yet.</div>';
+        historyList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-tertiary);">No items scanned yet.</div>';
         return;
     }
 
     searchHistory.forEach((item) => {
         const row = document.createElement('div');
-        row.className = 'lb-row'; // reusing leaderboard row styling
+        row.className = 'history-row';
+
+        const catKey = item.categoryKey || 'unknown';
 
         row.innerHTML = `
-            <div class="lb-col">${escapeHTML(item.itemName)}</div>
-            <div class="lb-col">${item.categoryName}</div>
-            <div class="lb-col" style="font-size: 0.85rem; color: var(--text-muted);">${item.date}</div>
+            <div class="history-col history-item-name">${escapeHTML(item.itemName)}</div>
+            <div class="history-col">
+                <span class="history-category-badge ${catKey}">${escapeHTML(item.categoryName)}</span>
+            </div>
+            <div class="history-col date">${item.date}</div>
         `;
         historyList.appendChild(row);
     });

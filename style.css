@@ -975,10 +975,11 @@ kbd {
 }
 
 /* ---------------------------------
-   Leaderboard Modal
+   History Modal
 -----------------------------------*/
-.leaderboard-header {
-    display: flex;
+.history-header {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr;
     padding: 1rem 1.5rem;
     background: var(--glass-bg);
     border-radius: 12px;
@@ -990,14 +991,15 @@ kbd {
     letter-spacing: 1px;
 }
 
-.leaderboard-list {
+.history-list {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.lb-row {
-    display: flex;
+.history-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr;
     padding: 1rem 1.5rem;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--glass-border);
@@ -1006,72 +1008,42 @@ kbd {
     transition: transform 0.2s, background 0.2s;
 }
 
-.lb-row:hover {
+.history-row:hover {
     transform: translateX(5px);
     background: var(--glass-bg);
 }
 
-.lb-row.current-user {
-    background: color-mix(in srgb, var(--active-color) 15%, transparent);
-    border-color: color-mix(in srgb, var(--active-color) 40%, transparent);
-}
-
-.lb-row.current-user .lb-name {
-    font-weight: 700;
-    color: var(--active-color);
-}
-
-.lb-col {
+.history-col {
     display: flex;
     align-items: center;
-}
-
-.lb-rank {
-    width: 60px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-}
-
-.lb-row:nth-child(1) .lb-rank {
-    color: #FFD700;
-    font-size: 1.3rem;
-}
-
-.lb-row:nth-child(2) .lb-rank {
-    color: #C0C0C0;
-    font-size: 1.2rem;
-}
-
-.lb-row:nth-child(3) .lb-rank {
-    color: #CD7F32;
-    font-size: 1.2rem;
-}
-
-.lb-name {
-    flex: 1;
     font-size: 1rem;
     color: var(--text-primary);
 }
 
-.lb-level {
-    width: 80px;
-    text-align: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    background: var(--glass-bg);
-    padding: 0.2rem 0;
-    border-radius: 4px;
-    margin-right: 1rem;
+.history-col.date {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    justify-content: flex-end;
 }
 
-.lb-xp {
-    width: 80px;
-    text-align: right;
-    justify-content: flex-end;
+.history-item-name {
     font-weight: 600;
-    color: var(--active-color);
 }
+
+.history-category-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.history-category-badge.wet { background: color-mix(in srgb, var(--color-wet) 20%, transparent); color: var(--color-wet); border: 1px solid color-mix(in srgb, var(--color-wet) 30%, transparent); }
+.history-category-badge.dry { background: color-mix(in srgb, var(--color-dry) 20%, transparent); color: var(--color-dry); border: 1px solid color-mix(in srgb, var(--color-dry) 30%, transparent); }
+.history-category-badge.hazard { background: color-mix(in srgb, var(--color-hazard) 20%, transparent); color: var(--color-hazard); border: 1px solid color-mix(in srgb, var(--color-hazard) 30%, transparent); }
+.history-category-badge.ewaste { background: color-mix(in srgb, var(--color-ewaste) 20%, transparent); color: var(--color-ewaste); border: 1px solid color-mix(in srgb, var(--color-ewaste) 30%, transparent); }
+.history-category-badge.unknown { background: color-mix(in srgb, var(--color-default) 20%, transparent); color: var(--color-default); border: 1px solid color-mix(in srgb, var(--color-default) 30%, transparent); }
 
 /* ---------------------------------
    Level Up Toast Notification
@@ -1418,12 +1390,18 @@ kbd {
         font-size: 1.5rem;
     }
     
-    .lb-row {
+    .history-row {
         padding: 0.75rem 1rem;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
     
-    .lb-level, .lb-xp {
-        width: auto;
+    .history-header {
+        display: none;
+    }
+    
+    .history-col.date {
+        justify-content: flex-start;
     }
 }
 
