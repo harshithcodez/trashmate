@@ -244,7 +244,7 @@ body {
 
 .auth-btn.primary-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .auth-btn.secondary-btn {
@@ -1033,9 +1033,20 @@ kbd {
     color: var(--text-secondary);
 }
 
-.lb-row:nth-child(1) .lb-rank { color: #FFD700; font-size: 1.3rem; }
-.lb-row:nth-child(2) .lb-rank { color: #C0C0C0; font-size: 1.2rem; }
-.lb-row:nth-child(3) .lb-rank { color: #CD7F32; font-size: 1.2rem; }
+.lb-row:nth-child(1) .lb-rank {
+    color: #FFD700;
+    font-size: 1.3rem;
+}
+
+.lb-row:nth-child(2) .lb-rank {
+    color: #C0C0C0;
+    font-size: 1.2rem;
+}
+
+.lb-row:nth-child(3) .lb-rank {
+    color: #CD7F32;
+    font-size: 1.2rem;
+}
 
 .lb-name {
     flex: 1;
@@ -1124,9 +1135,20 @@ kbd {
 }
 
 @keyframes floatUp {
-    0% { opacity: 0; transform: translateY(0) scale(0.5); }
-    20% { opacity: 1; transform: translateY(-20px) scale(1.2); }
-    100% { opacity: 0; transform: translateY(-80px) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translateY(-20px) scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(1);
+    }
 }
 
 /* Utility */
@@ -1266,24 +1288,167 @@ kbd {
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .question-text {
-        font-size: 2.25rem;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .navbar {
-        padding: 1.5rem;
+        padding: 1rem;
+    }
+    
+    .main-container {
+        padding: 1rem;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .nav-actions {
+        gap: 0.5rem;
+    }
+
+    .nav-actions .glass-btn {
+        padding: 0.5rem;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .nav-actions .glass-btn span:not(.badge) {
+        display: none;
+    }
+
+    .badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        font-size: 0.65rem;
+    }
+    
+    .nav-actions #stats-trigger {
+        position: relative;
+    }
+
+    .search-bar-wrapper {
+        padding: 0.25rem;
+        border-radius: 16px;
+    }
+
+    .search-icon {
+        margin: 0 0.5rem;
+        font-size: 1.2rem;
+    }
+
+    .search-bar-wrapper input {
+        font-size: 1rem;
+        padding: 0.75rem 0;
+        text-overflow: ellipsis;
+    }
+
+    .action-icon {
+        font-size: 1.1rem;
+        padding: 0.4rem;
+        margin-right: 0.2rem;
+    }
+
+    .search-submit {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        font-size: 1.1rem;
     }
 
     .card-content {
-        padding: 2rem;
+        padding: 1.5rem;
     }
 
     .icon-stage {
         width: 60px;
         height: 60px;
         font-size: 2rem;
+        border-radius: 16px;
     }
 
     .category-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+
+    .extra-info {
+        grid-template-columns: 1fr;
+        margin: 1.5rem 0;
+    }
+
+    .rule-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .modal-header {
+        padding: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1.25rem;
+    }
+
+    .modal-window {
+        width: 95%;
+    }
+    
+    .rule-card {
+        padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .rule-icon {
+        font-size: 1.5rem;
+    }
+    
+    .stat-box {
+        padding: 1rem;
+    }
+    
+    .stat-box i {
+        font-size: 1.25rem;
+    }
+    
+    .stat-box h2 {
+        font-size: 1.5rem;
+    }
+    
+    .lb-row {
+        padding: 0.75rem 1rem;
+    }
+    
+    .lb-level, .lb-xp {
+        width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .question-text {
+        font-size: 1.75rem;
+    }
+    
+    .logo span {
+        display: none;
+    }
+    
+    .logo-icon {
+        font-size: 1.5rem;
+    }
+    
+    .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .premium-card {
+        border-radius: 20px;
+    }
+    
+    .auth-card {
+        padding: 2rem 1.5rem;
     }
 }

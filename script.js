@@ -1,4 +1,5 @@
 // --- 10. Massive 200+ Waste Items Dataset ---
+import TOKEN from './config.js'
 const wasteData = [
     {
         category: "wet",
@@ -231,21 +232,21 @@ let searchHistory = JSON.parse(localStorage.getItem('trashMateHistory')) || [];
 function saveToHistory(itemName, categoryKey) {
     const categoryName = categoryDetails[categoryKey] ? categoryDetails[categoryKey].name : "Unknown";
     const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    
+
     // Add to beginning of array
     searchHistory.unshift({ itemName: capitalize(itemName), categoryName, date });
-    
+
     // Keep max 50 items
     if (searchHistory.length > 50) {
         searchHistory.pop();
     }
-    
+
     localStorage.setItem('trashMateHistory', JSON.stringify(searchHistory));
 }
 
 function renderHistory() {
     historyList.innerHTML = '';
-    
+
     if (searchHistory.length === 0) {
         historyList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No items scanned yet.</div>';
         return;
@@ -254,7 +255,7 @@ function renderHistory() {
     searchHistory.forEach((item) => {
         const row = document.createElement('div');
         row.className = 'lb-row'; // reusing leaderboard row styling
-        
+
         row.innerHTML = `
             <div class="lb-col">${escapeHTML(item.itemName)}</div>
             <div class="lb-col">${item.categoryName}</div>
@@ -274,17 +275,14 @@ inputEl.addEventListener('keypress', (e) => {
 inputEl.addEventListener('input', () => {
     if (inputEl.value.trim().length > 0) {
         clearBtn.classList.remove('hidden');
-        cameraBtn.classList.add('hidden');
     } else {
         clearBtn.classList.add('hidden');
-        cameraBtn.classList.remove('hidden');
     }
 });
 
 clearBtn.addEventListener('click', () => {
     inputEl.value = '';
     clearBtn.classList.add('hidden');
-    cameraBtn.classList.remove('hidden');
     inputEl.focus();
 });
 
@@ -443,6 +441,7 @@ function resetView() {
 
     inputEl.value = '';
     clearBtn.classList.add('hidden');
+    cameraBtn.classList.remove('hidden');
     confidenceFill.style.width = '0%';
 
     resultSection.style.opacity = '0';
@@ -481,9 +480,8 @@ function handleImageUpload(e) {
 }
 
 async function classifyImageWithGemini(base64Image, mimeType, filename) {
-    const apiKey = "AIzaSyA2r8UQIP8J7hLJ4yku8QvvoPwdY8GiDCY"; // TODO: Replace with your actual Gemini API key
+    const apiKey = TOKEN;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
     const requestBody = {
         contents: [
             {
@@ -585,4 +583,15 @@ function escapeHTML(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+// --- Service Worker Registration ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((registration) => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, (err) => {
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    });
 }
