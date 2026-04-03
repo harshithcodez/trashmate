@@ -523,11 +523,9 @@ async function classifyImageWithGemini(base64Image, mimeType, filename) {
 
         if (data.candidates && data.candidates.length > 0) {
             const resultText = data.candidates[0].content.parts[0].text.trim();
-            console.log("Gemini identified:", resultText);
             const guess = identifyFromClassName(resultText);
             displayResult(guess.categoryKey, guess.displayStr);
         } else {
-            console.log("No objects detected. Falling back to filename.");
             const guess = identifyFromFilename(filename);
             displayResult(guess.categoryKey, guess.displayStr);
         }
