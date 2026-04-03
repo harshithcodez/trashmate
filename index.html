@@ -16,15 +16,21 @@
         <div class="orb orb-core" id="dynamic-orb"></div>
         <div class="noise-overlay"></div>
     </div>
-
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar" id="app-nav">
         <div class="logo">
             <i class="ri-recycle-fill logo-icon"></i>
             <span>TrashMate</span>
         </div>
         <div class="nav-actions">
-            <button id="stats-trigger" class="glass-btn">
+            <button id="theme-toggle" class="glass-btn" title="Toggle Theme">
+                <i class="ri-moon-line" id="theme-icon"></i>
+            </button>
+            <button id="history-trigger" class="glass-btn" title="Scan History">
+                <i class="ri-history-line"></i>
+                <span>History</span>
+            </button>
+            <button id="stats-trigger" class="glass-btn" title="Statistics">
                 <i class="ri-bar-chart-box-line"></i>
                 <span id="stats-badge" class="badge">0</span>
             </button>
@@ -36,7 +42,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="main-container">
+    <main class="main-container" id="app-main">
 
         <!-- Search Area -->
         <div class="search-section" id="search-section">
@@ -238,6 +244,30 @@
         </div>
     </div>
 
+    <!-- History Modal -->
+    <div id="history-modal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Scan History 🕒</h3>
+                <button id="close-history-btn" class="close-modal-btn">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="leaderboard-header">
+                    <div class="lb-col">Item Name</div>
+                    <div class="lb-col">Category</div>
+                    <div class="lb-col">Date</div>
+                </div>
+                <div id="history-list" class="leaderboard-list">
+                    <!-- History items injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="script.js"></script>
 </body>
 

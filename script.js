@@ -158,6 +158,43 @@ const statDry = document.getElementById('stat-dry');
 const statHazard = document.getElementById('stat-hazard');
 const statEwaste = document.getElementById('stat-ewaste');
 
+// History Elements
+const historyTrigger = document.getElementById('history-trigger');
+const historyModal = document.getElementById('history-modal');
+const closeHistoryBtn = document.getElementById('close-history-btn');
+const historyList = document.getElementById('history-list');
+
+// --- Theme Management ---
+const themeToggleBtn = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+
+const getPreferredTheme = () => {
+    const savedTheme = localStorage.getItem('trashMateTheme');
+    if (savedTheme) {
+        return savedTheme;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+let currentTheme = getPreferredTheme();
+
+const applyTheme = (theme) => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+        themeIcon.className = 'ri-sun-line';
+    } else {
+        themeIcon.className = 'ri-moon-line';
+    }
+};
+
+applyTheme(currentTheme);
+
+themeToggleBtn.addEventListener('click', () => {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('trashMateTheme', currentTheme);
+    applyTheme(currentTheme);
+});
+
 // --- 6. Statistics State Management ---
 let userStats = JSON.parse(localStorage.getItem('trashMateStats')) || {
     total: 0,
@@ -179,10 +216,52 @@ updateStatsUI();
 
 function recordClassification(categoryKey) {
     if (categoryKey === 'unknown') return; // Do not count failed classifications
+
     userStats.total += 1;
     userStats[categoryKey] += 1;
+
     localStorage.setItem('trashMateStats', JSON.stringify(userStats));
+
     updateStatsUI();
+}
+
+// --- Item History Management ---
+let searchHistory = JSON.parse(localStorage.getItem('trashMateHistory')) || [];
+
+function saveToHistory(itemName, categoryKey) {
+    const categoryName = categoryDetails[categoryKey] ? categoryDetails[categoryKey].name : "Unknown";
+    const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    
+    // Add to beginning of array
+    searchHistory.unshift({ itemName: capitalize(itemName), categoryName, date });
+    
+    // Keep max 50 items
+    if (searchHistory.length > 50) {
+        searchHistory.pop();
+    }
+    
+    localStorage.setItem('trashMateHistory', JSON.stringify(searchHistory));
+}
+
+function renderHistory() {
+    historyList.innerHTML = '';
+    
+    if (searchHistory.length === 0) {
+        historyList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No items scanned yet.</div>';
+        return;
+    }
+
+    searchHistory.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'lb-row'; // reusing leaderboard row styling
+        
+        row.innerHTML = `
+            <div class="lb-col">${escapeHTML(item.itemName)}</div>
+            <div class="lb-col">${item.categoryName}</div>
+            <div class="lb-col" style="font-size: 0.85rem; color: var(--text-muted);">${item.date}</div>
+        `;
+        historyList.appendChild(row);
+    });
 }
 
 // --- Event Listeners ---
@@ -231,6 +310,15 @@ statsTrigger.addEventListener('click', () => toggleModal(statsModal, true));
 closeStatsBtn.addEventListener('click', () => toggleModal(statsModal, false));
 statsModal.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal-backdrop')) toggleModal(statsModal, false);
+});
+
+historyTrigger.addEventListener('click', () => {
+    renderHistory();
+    toggleModal(historyModal, true);
+});
+closeHistoryBtn.addEventListener('click', () => toggleModal(historyModal, false));
+historyModal.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-backdrop')) toggleModal(historyModal, false);
 });
 
 // --- Core Logic ---
@@ -292,6 +380,7 @@ function displayResult(key, rawInput) {
 
     // Tracking
     recordClassification(key);
+    saveToHistory(rawInput, key);
 
     document.documentElement.style.setProperty('--active-color', data.colorVar);
     dynamicOrb.style.transform = 'translate(-50%, -50%) scale(1.1) rotate(15deg)';
@@ -370,30 +459,98 @@ function resetView() {
     }, 300);
 }
 
-// --- Image Scanning Simulation ---
+// --- Image Scanning API Integration ---
 function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
 
+    scanningOverlay.classList.remove('hidden');
+    document.documentElement.style.setProperty('--color-default', '#3b82f6');
+
     const reader = new FileReader();
     reader.onload = (event) => {
         scannedPreview.src = event.target.result;
-        startScanningSimulation(file.name);
+
+        // Extract base64 without prefix
+        const base64Image = event.target.result.split(",")[1];
+
+        classifyImageWithGemini(base64Image, file.type, file.name);
     };
     reader.readAsDataURL(file);
     e.target.value = '';
 }
 
-function startScanningSimulation(filename) {
-    scanningOverlay.classList.remove('hidden');
-    document.documentElement.style.setProperty('--color-default', '#3b82f6');
-    const scanTime = Math.floor(Math.random() * 1500) + 2500;
+async function classifyImageWithGemini(base64Image, mimeType, filename) {
+    const apiKey = "AIzaSyA2r8UQIP8J7hLJ4yku8QvvoPwdY8GiDCY"; // TODO: Replace with your actual Gemini API key
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    setTimeout(() => {
+    const requestBody = {
+        contents: [
+            {
+                parts: [
+                    {
+                        text: "Analyze this image and identify the main object or waste item. Respond with ONLY the name of the item (e.g., 'plastic bottle', 'apple peel', 'cardboard box'). Keep it extremely brief."
+                    },
+                    {
+                        inlineData: {
+                            mimeType: mimeType || "image/jpeg",
+                            data: base64Image
+                        }
+                    }
+                ]
+            }
+        ]
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+        scanningOverlay.classList.add('hidden');
+
+        if (!response.ok) {
+            console.error("Gemini API Error details:", data);
+            throw new Error(data.error?.message || "Unknown API error");
+        }
+
+        if (data.candidates && data.candidates.length > 0) {
+            const resultText = data.candidates[0].content.parts[0].text.trim();
+            console.log("Gemini identified:", resultText);
+            const guess = identifyFromClassName(resultText);
+            displayResult(guess.categoryKey, guess.displayStr);
+        } else {
+            console.log("No objects detected. Falling back to filename.");
+            const guess = identifyFromFilename(filename);
+            displayResult(guess.categoryKey, guess.displayStr);
+        }
+    } catch (error) {
+        console.error("API Error: ", error.message);
         scanningOverlay.classList.add('hidden');
         const guess = identifyFromFilename(filename);
         displayResult(guess.categoryKey, guess.displayStr);
-    }, scanTime);
+    }
+}
+
+function identifyFromClassName(className) {
+    const lowerName = className.toLowerCase();
+
+    for (const group of wasteData) {
+        for (const word of group.keywords) {
+            if (lowerName.includes(word)) {
+                return { categoryKey: group.category, displayStr: 'Detected ' + capitalize(word) };
+            }
+        }
+    }
+    return {
+        categoryKey: "unknown",
+        displayStr: 'Detected ' + capitalize(className)
+    };
 }
 
 function identifyFromFilename(filename) {
