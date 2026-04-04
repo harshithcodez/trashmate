@@ -252,21 +252,48 @@ function renderHistory() {
         return;
     }
 
+    // Group items by date
+    const groupedHistory = {};
     searchHistory.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = 'history-row';
+        let datePart = "Unknown Date";
+        let timePart = item.date;
 
-        const catKey = item.categoryKey || 'unknown';
+        if (item.date && item.date.includes(',')) {
+            const parts = item.date.split(',');
+            datePart = parts[0].trim();
+            timePart = parts.length > 1 ? parts.slice(1).join(',').trim() : item.date;
+        }
 
-        row.innerHTML = `
-            <div class="history-col history-item-name">${escapeHTML(item.itemName)}</div>
-            <div class="history-col">
-                <span class="history-category-badge ${catKey}">${escapeHTML(item.categoryName)}</span>
-            </div>
-            <div class="history-col date">${item.date}</div>
-        `;
-        historyList.appendChild(row);
+        if (!groupedHistory[datePart]) {
+            groupedHistory[datePart] = [];
+        }
+        groupedHistory[datePart].push({ ...item, timePart });
     });
+
+    for (const [dateGroup, items] of Object.entries(groupedHistory)) {
+        // Render Group Header
+        const headerRow = document.createElement('div');
+        headerRow.className = 'history-group-header';
+        headerRow.textContent = dateGroup;
+        historyList.appendChild(headerRow);
+
+        // Render Items for this Group
+        items.forEach((item) => {
+            const row = document.createElement('div');
+            row.className = 'history-row';
+
+            const catKey = item.categoryKey || 'unknown';
+
+            row.innerHTML = `
+                <div class="history-col history-item-name">${escapeHTML(item.itemName)}</div>
+                <div class="history-col">
+                    <span class="history-category-badge ${catKey}">${escapeHTML(item.categoryName)}</span>
+                </div>
+                <div class="history-col date">${escapeHTML(item.timePart)}</div>
+            `;
+            historyList.appendChild(row);
+        });
+    }
 }
 
 // --- Event Listeners ---

@@ -997,6 +997,21 @@ kbd {
     gap: 0.5rem;
 }
 
+.history-group-header {
+    padding: 1rem 0.5rem 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.5rem;
+}
+
+.history-group-header:first-child {
+    margin-top: 0;
+    padding-top: 0.5rem;
+}
+
 .history-row {
     display: grid;
     grid-template-columns: 2fr 1.5fr 1fr;
